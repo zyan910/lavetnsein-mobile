@@ -4,78 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- MOBILE TOP BAR COLOR FIX -->
-<meta name="theme-color" content="#ff9a9e">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- MOBILE STATUS BAR -->
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-<title>say yes</title>
+<title>system verification</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    text-align: center;
-    height: 100vh;
     overflow: hidden;
     transition: background 0.6s ease, color 0.6s ease;
 }
 
-/* HACKER MODE */
+/* MODES */
 body.hacker {
     background: black;
     color: #00ff88;
 }
 
 body.valentine {
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    background: linear-gradient(135deg,#ff9a9e,#fad0c4);
     color: white;
 }
 
-h1 {
-    margin-top: 16vh;
-    font-size: 1.9rem;
-    padding: 0 20px;
-    line-height: 1.3;
-}
-
-#timer {
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-}
-
-.buttons {
-    margin-top: 25px;
-}
-
-button {
-    padding: 18px 30px;
-    font-size: 20px;
-    border: none;
-    border-radius: 35px;
-    margin: 12px;
-    transition: all 0.2s ease;
-}
-
-#yesBtn {
-    background: #ff4d6d;
-    color: white;
-}
-
-#noBtn {
-    background: #444;
-    color: white;
-}
-
-/* MATRIX BACKGROUND */
+/* MATRIX */
 #matrix {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
+    z-index: 0;
     overflow: hidden;
-    z-index: -1;
     font-family: monospace;
     color: #00ff88;
     opacity: 0.25;
@@ -92,7 +52,39 @@ button {
     to { transform: translateY(100vh); }
 }
 
-/* TOUCH HEARTS */
+/* CONTENT */
+#content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding-top: 18vh;
+    transition: opacity 0.5s ease;
+}
+
+.fade-out { opacity: 0; }
+.fade-in { opacity: 1; }
+
+h1 {
+    font-size: 1.9rem;
+    padding: 0 20px;
+    line-height: 1.3;
+}
+
+#timer { font-size: 1.1rem; }
+
+button {
+    padding: 18px 30px;
+    font-size: 20px;
+    border: none;
+    border-radius: 35px;
+    margin: 12px;
+    transition: transform 0.2s;
+}
+
+#yesBtn { background:#ff4d6d; color:white; }
+#noBtn { background:#444; color:white; }
+
+/* HEARTS */
 .heart {
     position: fixed;
     pointer-events: none;
@@ -101,29 +93,19 @@ button {
 }
 
 @keyframes float {
-    to {
-        transform: translateY(-40px);
-        opacity: 0;
-    }
+    to { transform: translateY(-40px); opacity:0; }
 }
 
-/* CONFETTI HEARTS */
+/* CONFETTI */
 .confetti-heart {
     position: fixed;
     font-size: 22px;
     animation: confettiFall 2s linear forwards;
-    pointer-events: none;
 }
 
 @keyframes confettiFall {
-    0% {
-        transform: translateY(-20px) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-    }
+    0% { transform: translateY(-20px) rotate(0); opacity:1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity:0; }
 }
 </style>
 </head>
@@ -132,125 +114,114 @@ button {
 
 <div id="matrix"></div>
 
+<div id="content" class="fade-in">
 <h1 id="question">
 Your phone security has been compromised.<br>
-To regain access, please complete the following:<br>
-Agree to go out with me on Valentine’s Day.
+To regain access, please click on the below button:<br>
 </h1>
 
 <div id="timer">time left: <span id="count">30</span></div>
 
-<div class="buttons">
-    <button id="yesBtn">Agree ❤️</button>
-    <button id="noBtn">Decline</button>
+<div>
+<button id="yesBtn">Regain Access</button>
+<button id="noBtn">Lose Access</button>
+</div>
 </div>
 
 <audio id="tapSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
-<audio id="yesSound" src="https://actions.google.com/sounds/v1/cartoon/concussive_hit_guitar_boing.ogg"></audio>
+<audio id="yesSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 
 <script>
-let yesBtn = document.getElementById("yesBtn");
-let noBtn = document.getElementById("noBtn");
-let question = document.getElementById("question");
-let tapSound = document.getElementById("tapSound");
-let yesSound = document.getElementById("yesSound");
-let countEl = document.getElementById("count");
-let matrix = document.getElementById("matrix");
-
-let size = 1;
 let stage = 0;
+let size = 1;
+let time = 30;
 
-/* YES BUTTON GROW */
-setInterval(() => {
-    if (size < 1.6) {
-        size += 0.02;
-        yesBtn.style.transform = `scale(${size})`;
-    }
-}, 1000);
+const body = document.body;
+const matrix = document.getElementById("matrix");
+const content = document.getElementById("content");
+const question = document.getElementById("question");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const countEl = document.getElementById("count");
+
+/* YES GROW */
+setInterval(()=>{
+ if(size<1.6){ size+=0.02; yesBtn.style.transform=`scale(${size})`; }
+},1000);
 
 /* TIMER */
-let time = 30;
-setInterval(() => {
-    time--;
-    if (time <= 0) time = 30;
-    countEl.textContent = time;
-}, 1000);
+setInterval(()=>{
+ time--; if(time<=0) time=30; countEl.textContent=time;
+},1000);
 
-/* BINARY RAIN */
-function createBinary() {
-    const col = document.createElement("div");
-    col.className = "binary";
-    col.style.left = Math.random() * 100 + "vw";
-    col.style.animationDuration = (3 + Math.random() * 5) + "s";
-    col.innerText = Array.from({length: 40}, () =>
-        Math.random() > 0.5 ? "1" : "0"
-    ).join("");
-    matrix.appendChild(col);
-    setTimeout(() => col.remove(), 8000);
+/* MATRIX RAIN */
+function binaryRain(){
+ let col=document.createElement("div");
+ col.className="binary";
+ col.style.left=Math.random()*100+"vw";
+ col.style.animationDuration=(3+Math.random()*5)+"s";
+ col.innerText=Array.from({length:40},()=>Math.random()>0.5?"1":"0").join("");
+ matrix.appendChild(col);
+ setTimeout(()=>col.remove(),8000);
 }
-setInterval(createBinary, 150);
+setInterval(binaryRain,150);
 
-/* BUTTON CLICKS */
-noBtn.addEventListener("click", () => {
-    tapSound.currentTime = 0;
-    tapSound.play();
+/* FADE HELPER */
+function fadeChange(callback){
+ content.classList.add("fade-out");
+ setTimeout(()=>{
+   callback();
+   content.classList.remove("fade-out");
+ },400);
+}
+
+/* BUTTONS */
+noBtn.onclick=()=>document.getElementById("tapSound").play();
+
+yesBtn.onclick=()=>{
+ document.getElementById("yesSound").play();
+ stage++;
+
+ fadeChange(()=>{
+  if(stage===1){
+    question.innerHTML="To Regain access, you must agree to go out with me on Valentine's.";
+  }
+  else if(stage===2){
+    body.classList.remove("hacker");
+    body.classList.add("valentine");
+    matrix.style.display="none";
+    heartConfetti();
+
+    question.innerHTML="Access Granted 💘<br>You’re officially my Valentine.";
+    document.getElementById("timer").style.display="none";
+    yesBtn.style.display="none";
+    noBtn.style.display="none";
+  }
+ });
+};
+
+/* TOUCH HEARTS */
+document.addEventListener("touchstart",e=>{
+ let t=e.touches[0]; spawnHeart(t.pageX,t.pageY);
 });
-
-yesBtn.addEventListener("click", () => {
-    yesSound.play();
-    stage++;
-
-    if (stage === 1) {
-        question.innerHTML =
-          "Verification step incomplete.<br>Please confirm again.";
-    }
-
-    else if (stage === 2) {
-        /* SWITCH TO VALENTINE MODE */
-        document.body.classList.remove("hacker");
-        document.body.classList.add("valentine");
-        matrix.style.display = "none";
-
-        heartConfetti();
-
-        question.innerHTML =
-          "Access Granted 💘<br>Looks like you're stuck with me this Valentine’s.";
-        document.querySelector(".buttons").style.display = "none";
-        document.getElementById("timer").style.display = "none";
-    }
-});
-
-/* TOUCH HEART TRAIL */
-document.addEventListener("touchmove", (e) => {
-    let t = e.touches[0];
-    spawnHeart(t.pageX, t.pageY);
-});
-document.addEventListener("touchstart", (e) => {
-    let t = e.touches[0];
-    spawnHeart(t.pageX, t.pageY);
-});
-
-function spawnHeart(x, y) {
-    let heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerHTML = "❤";
-    heart.style.left = x + "px";
-    heart.style.top = y + "px";
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 1000);
+function spawnHeart(x,y){
+ let h=document.createElement("div");
+ h.className="heart"; h.innerHTML="❤";
+ h.style.left=x+"px"; h.style.top=y+"px";
+ document.body.appendChild(h);
+ setTimeout(()=>h.remove(),1000);
 }
 
 /* CONFETTI */
-function heartConfetti() {
-    for (let i = 0; i < 40; i++) {
-        let heart = document.createElement("div");
-        heart.className = "confetti-heart";
-        heart.innerHTML = "💖";
-        heart.style.left = Math.random() * 100 + "vw";
-        heart.style.animationDuration = (1.5 + Math.random()) + "s";
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 2000);
-    }
+function heartConfetti(){
+ for(let i=0;i<40;i++){
+  let h=document.createElement("div");
+  h.className="confetti-heart";
+  h.innerHTML="💖";
+  h.style.left=Math.random()*100+"vw";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),2000);
+ }
 }
 </script>
 
