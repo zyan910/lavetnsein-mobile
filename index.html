@@ -117,15 +117,14 @@ button {
 <div id="content" class="fade-in">
 <h1 id="question">
 Your phone security has been compromised.<br>
-To regain access, please complete the following:<br>
-Agree to go out with me on Valentine’s Day.
+To regain access, please click the below button:<br>
 </h1>
 
 <div id="timer">time left: <span id="count">30</span></div>
 
 <div>
-<button id="yesBtn">Agree ❤️</button>
-<button id="noBtn">Decline</button>
+<button id="yesBtn">Yes Access</button>
+<button id="noBtn">No</button>
 </div>
 </div>
 
@@ -185,7 +184,7 @@ yesBtn.onclick=()=>{
 
  fadeChange(()=>{
   if(stage===1){
-    question.innerHTML="Verification incomplete.<br>Please confirm again.";
+    question.innerHTML="hey princess, would you mind going out with me on the 14th of Feb, casual random day ofc..<br>(this is the part where you say yes).";
   }
   else if(stage===2){
     body.classList.remove("hacker");
@@ -193,7 +192,7 @@ yesBtn.onclick=()=>{
     matrix.style.display="none";
     heartConfetti();
 
-    question.innerHTML="Access Granted 💘<br>You’re officially my Valentine.";
+    question.innerHTML="welcome back pancake 💘<br>you’re officially my valentine.";
     document.getElementById("timer").style.display="none";
     yesBtn.style.display="none";
     noBtn.style.display="none";
